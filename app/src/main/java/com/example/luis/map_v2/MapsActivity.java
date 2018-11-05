@@ -20,11 +20,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements
-        GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener, OnMapReadyCallback, OnRequestPermissionsResultCallback {
 
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    /**
+     * Bandera que indica si un permiso solicitado ha sido denegado después de regresar
+     * */
     private boolean mPermissionDenied = false;
     private GoogleMap mMap;
 
@@ -48,15 +51,18 @@ public class MapsActivity extends FragmentActivity implements
 
     }
 
+    /**
+     * Habilita la capa Mi ubicación si se ha otorgado el permiso de ubicación.
+     */
     private void enableMyLocation() {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
+            // Falta el permiso para acceder a la ubicación.
             PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE,
                     Manifest.permission.ACCESS_FINE_LOCATION, true);
         } else if (mMap != null) {
-            // Access to the location has been granted to the app.
+            // El acceso a la ubicación ha sido otorgado a la aplicación.
             mMap.setMyLocationEnabled(true);
         }
     }
@@ -64,7 +70,8 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public boolean onMyLocationButtonClick() {
         Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
-
+        // Devuelve false para que no consumamos el evento y el comportamiento predeterminado todavía ocurra
+        // (la cámara anima a la posición actual del usuario).
         return false;
     }
 
@@ -81,24 +88,19 @@ public class MapsActivity extends FragmentActivity implements
 
         if (PermissionUtils.isPermissionGranted(permissions, grantResults,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Enable the my location layer if the permission has been granted.
+            // Habilitar la capa de mi ubicación si se ha otorgado el permiso.
             enableMyLocation();
         } else {
-            // Display the missing permission error dialog when the fragments resume.
+            // Muestra el diálogo de error de permiso faltante cuando se reanudan los fragmentos.
             mPermissionDenied = true;
         }
-    }
-
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        return false;
     }
 
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
         if (mPermissionDenied) {
-            // Permission was not granted, display error dialog.
+            // No se concedió el permiso, muestra el cuadro de diálogo de error.
             showMissingPermissionError();
             mPermissionDenied = false;
         }
