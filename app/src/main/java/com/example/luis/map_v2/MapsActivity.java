@@ -47,8 +47,6 @@ public class MapsActivity extends FragmentActivity implements
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
-
-
     }
 
     /**
